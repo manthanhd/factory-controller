@@ -27,11 +27,9 @@ function requestHandler(req, res) {
     // maybe some error handling
     var host = matchKnownSubdomains(subdomain);
     if (host != false) {
-        console.log("Matched!");
         var proxy = http.createClient(host.port, host.address);
 
         proxy.addListener("error", function (socketException) {
-            console.log("Request failed.");
             res.end("Unreachable.");
         });
 
@@ -62,8 +60,10 @@ function requestHandler(req, res) {
         req.addListener('end', function () {
             proxy_request.end();
         });
+    } else {
+        res.statusCode = 404;
+        res.end();
     }
-    res.end("jhbdkf");
 }
 
 function matchKnownSubdomains(subdomain) {
