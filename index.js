@@ -2,6 +2,7 @@ var http = require('http');
 var express = require('express');
 var fs = require('fs');
 
+// CONFIGURATION SERVER ----------------------------------------------------------------------------
 var app = express();
 var bodyParser = require('body-parser');
 var multer = require('multer');
@@ -10,6 +11,21 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(multer()); // for parsing multipart/form-data
 
+app.post('/host', function(req, res) {
+    if(!req.body.name || !req.body.port || !req.body.address) {
+        res.send(400);
+        return;
+    }
+
+    map.push({name: req.body.name, address: req.body.address, port: req.body.port});
+    res.send(200);
+});
+
+app.listen(process.env.PORT_CONFIG || 8081, function() {
+    console.log("Configuration server listening.");
+});
+
+// MAIN SERVER ------------------------------------------------------------------------------------
 var map = JSON.parse(fs.readFileSync('host-map.json', 'utf8'));
 map = map.hosts;
 
@@ -27,20 +43,6 @@ for (var i = 0; i < map.length; i++) {
 var server = http.createServer();
 server.addListener("request", requestHandler);
 server.listen(process.env.PORT || 8080);
-
-app.post('/host', function(req, res) {
-    if(!req.body.name || !req.body.port || !req.body.address) {
-        res.send(400);
-        return;
-    }
-
-    map.push({name: req.body.name, address: req.body.address, port: req.body.port});
-    res.send(200);
-})
-
-app.listen(process.env.PORT_CONFIG || 8081, function() {
-    console.log("Configuration server listening.");
-})
 
 function requestHandler(req, res) {
     var vhost = req.headers.host;
