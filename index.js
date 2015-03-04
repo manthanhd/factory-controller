@@ -85,9 +85,9 @@ app.delete('/host/:name', function(req, res) {
     map.splice(deletionIndex, 1);
     res.sendStatus(200);
 });
-
-app.listen(process.env.PORT_CONFIG || 8081, function(port) {
-    console.log("Configuration server listening on " + port);
+var portForConfigurationServer = process.env.PORT_CONFIG || 8081;
+app.listen(portForConfigurationServer, function() {
+    console.log("Configuration server listening on " + portForConfigurationServer);
     console.log("GET, POST, PUT and DELETE available on /host.");
 });
 
