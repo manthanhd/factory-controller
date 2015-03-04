@@ -7,22 +7,88 @@ var app = express();
 var bodyParser = require('body-parser');
 var multer = require('multer');
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-app.use(multer()); // for parsing multipart/form-data
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(multer());
 
 app.post('/host', function(req, res) {
     if(!req.body.name || !req.body.port || !req.body.address) {
-        res.send(400);
+        res.sendStatus(400);
         return;
     }
 
     map.push({name: req.body.name, address: req.body.address, port: req.body.port});
-    res.send(200);
+    res.sendStatus(200);
 });
 
-app.listen(process.env.PORT_CONFIG || 8081, function() {
-    console.log("Configuration server listening.");
+app.get('/host', function(req, res) {
+    res.send({hosts: map});
+});
+
+app.put('/host/:name', function(req, res) {
+    var hostToModify = req.params.name;
+    if(!hostToModify) {
+        res.sendStatus(400);
+        return;
+    }
+
+    if(!req.body.name && !req.body.port && !req.body.address) {
+        res.sendStatus(400);
+        return;
+    }
+
+    for(var i = 0; i < map.length; i++){
+        var host = map[i];
+
+        if(host.name == hostToModify) {
+            if(req.body.name) {
+                host.name = req.body.name;
+            }
+
+            if(req.body.port) {
+                host.port = req.body.port;
+            }
+
+            if(req.body.address) {
+                host.address = req.body.address;
+            }
+            res.sendStatus(200);
+            return;
+        }
+    }
+
+    res.sendStatus(404);
+});
+
+app.delete('/host/:name', function(req, res) {
+    var hostToDelete = req.params.name;
+    if(!hostToDelete) {
+        res.sendStatus(400);
+        return;
+    }
+
+    var deletionIndex = -1;
+    for(var i = 0; i < map.length; i++){
+        var host = map[i];
+
+        if(host.name == hostToDelete) {
+            deletionIndex = i;
+            break;
+        }
+    }
+
+    if(deletionIndex == -1) {
+        res.sendStatus(404);
+        return;
+    }
+
+    map.splice(deletionIndex, 1);
+    res.sendStatus(200);
+});
+
+app.listen(process.env.PORT_CONFIG || 8081, function(port) {
+    console.log("Configuration server listening on " + port);
+    console.log("GET, POST, PUT and DELETE available on /host.");
 });
 
 // MAIN SERVER ------------------------------------------------------------------------------------
@@ -93,6 +159,7 @@ function requestHandler(req, res) {
     }
 }
 
+// UTILITY FUNCTIONS ----------------------------------------------------------------
 function matchKnownSubdomains(subdomain) {
     for (var i = 0; i < map.length; i++) {
         var host = map[i];
