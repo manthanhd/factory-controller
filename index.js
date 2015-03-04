@@ -28,8 +28,32 @@ function requestHandler(req, res) {
     var host = matchKnownSubdomains(subdomain);
     if (host != false) {
         console.log("Matched!");
+        var proxy = http.createClient(host.port, host.address);
 
-        proxyThrough(req, res, host);
+        proxy.addListener("error", function (socketException) {
+            console.log("Request failed.");
+            res.end("Unreachable.");
+        });
+
+        req.headers["X-Forwarded-For"] = req.connection.remoteAddress;
+
+        var proxy_request = proxy.request(req.method, req.url, req.headers);
+
+        proxy_request.addListener('response', function (proxy_response) {
+            res.writeHead(proxy_response.statusCode, proxy_response.headers);
+            if (proxy_response.statusCode === 304) {
+                res.end();
+                return;
+            }
+
+            proxy_response.addListener('data', function (chunk) {
+                res.write(chunk, 'binary');
+            });
+
+            proxy_response.addListener('end', function () {
+                res.end();
+            });
+        });
 
         req.addListener('data', function (chunk) {
             proxy_request.write(chunk, 'binary');
@@ -59,30 +83,5 @@ function getSubDomain(hostname) {
 }
 
 function proxyThrough(req, res, host) {
-    var proxy = http.createClient(host.port, host.address);
 
-    proxy.addListener("error", function (socketException) {
-        console.log("Request failed.");
-        res.end("Unreachable.");
-    });
-
-    req.headers["X-Forwarded-For"] = req.connection.remoteAddress;
-
-    var proxy_request = proxy.request(req.method, req.url, req.headers);
-
-    proxy_request.addListener('response', function (proxy_response) {
-        res.writeHead(proxy_response.statusCode, proxy_response.headers);
-        if (proxy_response.statusCode === 304) {
-            res.end();
-            return;
-        }
-
-        proxy_response.addListener('data', function (chunk) {
-            res.write(chunk, 'binary');
-        });
-
-        proxy_response.addListener('end', function () {
-            res.end();
-        });
-    });
 }
