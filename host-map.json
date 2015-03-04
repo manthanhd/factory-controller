@@ -1,0 +1,9 @@
+{
+  "hosts": [
+    {
+      "name": "express1",
+      "address": "localhost",
+      "port": "3000"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "factory-controller",
+  "version": "0.0.1",
+  "description": "Node.js dynamic real-time reverse proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Manthan Dave",
+  "license": "MIT"
+}
