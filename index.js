@@ -7,6 +7,9 @@ var app = express();
 var bodyParser = require('body-parser');
 var multer = require('multer');
 
+var portForConfigurationServer = process.env.CONFIG_PORT || 8081;
+var portForServer = process.env.PORT || 8080;
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer());
@@ -94,7 +97,7 @@ app.delete('/host/:name', function(req, res) {
     map.splice(deletionIndex, 1);
     res.sendStatus(200);
 });
-var portForConfigurationServer = process.env.PORT_CONFIG || 8081;
+
 app.listen(portForConfigurationServer, function() {
     console.log("Configuration server listening on " + portForConfigurationServer);
     console.log("GET, POST, PUT and DELETE available on /host.");
@@ -117,7 +120,7 @@ for (var i = 0; i < map.length; i++) {
 
 var server = http.createServer();
 server.addListener("request", requestHandler);
-server.listen(process.env.PORT || 8080);
+server.listen(portForServer);
 
 function requestHandler(req, res) {
     var vhost = req.headers.host;
