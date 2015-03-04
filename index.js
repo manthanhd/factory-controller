@@ -11,6 +11,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer());
 
+function updateHostMapFile() {
+    var data = JSON.stringify({hosts: map});
+    fs.writeFile("host-map.json", data, function(err){
+        if(err) console.log(err);
+    });
+}
+
+setInterval(updateHostMapFile, 5000);
+
 app.post('/host', function(req, res) {
     if(!req.body.name || !req.body.port || !req.body.address) {
         res.sendStatus(400);
