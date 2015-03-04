@@ -7,8 +7,15 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Manthan Dave",
+  "author": "Manthan Dave <manthanhd@live.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/manthanhd/factory-controller.git"
+  },
+  "bugs": {
+    "url": "https://github.com/manthanhd/factory-controller/issues"
+  },
   "dependencies": {
     "body-parser": "^1.12.0",
     "express": "^4.12.2",
