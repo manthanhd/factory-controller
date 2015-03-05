@@ -33,4 +33,4 @@ Open up your browser and navigate to:
 ```
 http://subdomain.domain.com:8080
 ```
-Note: Default server port is 8080 and configuration port is 81.
+Note: Default server port is 8080 and configuration port is 8081.
